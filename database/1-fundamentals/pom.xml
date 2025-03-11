@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.codeus</groupId>
+        <artifactId>database</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>1-fundamentals</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>1-1-data-querying</module>
+        <module>1-2-aggregation-and-grouping</module>
+        <module>1-3-joins-and-subqueries</module>
+        <module>1-4-data-modification-and-security</module>
+        <module>1-5-transaction-management</module>
+        <module>1-6-transaction-concurrency-control</module>
+        <module>1-7-indexing-and-query-execution-planning</module>
+        <module>1-8-views</module>
+        <module>1-9-data-normalization</module>
+        <module>1-10-data-analytics</module>
+        <module>fundamentals-recap</module>
+    </modules>
+
+</project>

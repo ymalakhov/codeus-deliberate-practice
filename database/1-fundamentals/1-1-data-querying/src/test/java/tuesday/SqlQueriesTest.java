@@ -27,6 +27,28 @@ public class SqlQueriesTest {
     private static final String TEST_DATA_FILE = "test-data.sql";
     private static final String QUERIES_DIR = "queries/";
 
+    @Test
+    @Order(1)
+    void testSelectAllCustomerNamesEasyWarmup() throws IOException, SQLException {
+        List<Map<String, Object>> results = executeQueryFromFile("queries/select_all_customer_names_easy_warmup.sql");
+        assertFalse(results.isEmpty(), "Query should return results");
+        assertEquals(6, results.size(), "Should be 6 customers");
+        // You could add more specific assertions to check for individual names if needed
+    }
+
+    @Test
+    @Order(2)
+    void testSelectKyivCustomersOrderedByNameEasyWarmup() throws IOException, SQLException {
+        List<Map<String, Object>> results = executeQueryFromFile("queries/select_kyiv_customers_ordered_by_name_easy_warmup.sql");
+        assertFalse(results.isEmpty(), "Query should return results");
+        assertEquals(2, results.size(), "Should be 2 customers from Kyiv");
+        List<String> customerNames = results.stream()
+                .map(row -> (String) row.get("customer_name"))
+                .toList();
+        assertTrue(customerNames.contains("Ivan Kyivsky"), "Should contain Ivan Kyivsky");
+        assertTrue(customerNames.contains("Maria Kyivska"), "Should contain Maria Kyivska");
+    }
+
     @BeforeAll
     static void startDatabase() throws IOException {
         System.out.println("Starting embedded PostgreSQL...");
@@ -101,7 +123,7 @@ public class SqlQueriesTest {
         return "src/test/resources/" + resourceName;
     }
 
-    @Order(1)
+    @Order(3)
     @Test
     void testSelectCustomersKyivLviv() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/select_customers_kyiv_lviv.sql");
@@ -116,7 +138,7 @@ public class SqlQueriesTest {
         assertTrue(customerNames.contains("Maria Kyivska"), "Should contain Maria Kyivska");
     }
 
-    @Order(7)
+    @Order(9)
     @Test
     void testSelectCustomersMAndA() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/select_customers_m_and_a.sql");
@@ -130,7 +152,7 @@ public class SqlQueriesTest {
         assertTrue(customerNames.contains("Maksym Kharkivsky"), "Should contain Maksym Kharkivsky");
     }
 
-    @Order(8)
+    @Order(10)
     @Test
     void testSelectCustomersUkraineNotKharkiv() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/select_customers_ukraine_not_kharkiv.sql");
@@ -145,7 +167,7 @@ public class SqlQueriesTest {
         assertTrue(customerNames.contains("Olena Dniprovska"), "Should contain Olena Dniprovska");
     }
 
-    @Order(2)
+    @Order(4)
     @Test
     void testSelectUniqueCustomerCitiesSorted() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/select_unique_customer_cities_sorted.sql");
@@ -157,7 +179,7 @@ public class SqlQueriesTest {
         assertEquals(List.of("Dnipro", "Kharkiv", "Kyiv", "Lviv"), cities, "Cities should be sorted alphabetically");
     }
 
-    @Order(3)
+    @Order(5)
     @Test
     void testSelectSavingsAccountsBalanceBetween() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/select_savings_accounts_balance_between.sql");
@@ -171,7 +193,7 @@ public class SqlQueriesTest {
         assertTrue(accountNumbers.contains("SA003"), "Should contain SA003");
     }
 
-    @Order(4)
+    @Order(6)
     @Test
     void testSelectCurrentAccountsBalanceOutOfRange() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/select_current_accounts_balance_out_of_range.sql");
@@ -185,7 +207,7 @@ public class SqlQueriesTest {
         assertTrue(accountNumbers.contains("CA004"), "Should contain CA004");
     }
 
-    @Order(9)
+    @Order(11)
     @Test
     void testSelectAccountsSortedByTypeAndBalance() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/select_accounts_sorted_by_type_and_balance.sql");
@@ -214,14 +236,16 @@ public class SqlQueriesTest {
             "queries/search_transaction_deposit_iliike_base.sql",
             "queries/search_transaction_draw_like_base.sql",
             "queries/customers_with_savings_accounts_kyiv_lviv_base.sql",
-            "queries/high_value_transactions_september_2023_base.sql"
+            "queries/high_value_transactions_september_2023_base.sql",
+            "queries/select_all_customer_names_easy_warmup.sql",
+            "queries/select_kyiv_customers_ordered_by_name_easy_warmup.sql"
     })
     void testQuerySyntax(String queryFile) throws IOException {
         // This test just ensures the query can be executed without syntax errors
         assertDoesNotThrow(() -> executeQueryFromFile(queryFile));
     }
 
-    @Order(5)
+    @Order(7)
     @Test
     void testListCustomersWithCheckingAccountsBase() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/list_customers_with_checking_accounts_base.sql");
@@ -235,7 +259,7 @@ public class SqlQueriesTest {
         assertTrue(customerNames.contains("Olena Dniprovska"), "Should contain Olena Dniprovska");
     }
 
-    @Order(6)
+    @Order(8)
     @Test
     void testFindTransactionsAbove10000SortedByDateBase() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/find_transactions_above_10000_sorted_by_date_base.sql");
@@ -244,7 +268,7 @@ public class SqlQueriesTest {
         assertEquals("2023-10-15", results.get(0).get("transaction_date").toString(), "Transaction date should be 2023-10-15");
     }
 
-    @Order(10)
+    @Order(12)
     @Test
     void testSearchTransactionDescriptionsLikeBase() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/search_transaction_descriptions_like_base.sql");
@@ -258,7 +282,7 @@ public class SqlQueriesTest {
         assertTrue(transactionTypes.contains("deposit"), "Should contain 'deposit' (a third time)");
     }
 
-    @Order(11)
+    @Order(13)
     @Test
     void testSearchTransactionDescriptionsIlikeBase() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/search_transaction_descriptions_ilike_base.sql");
@@ -272,7 +296,7 @@ public class SqlQueriesTest {
         assertTrue(transactionTypes.contains("deposit"), "Should contain 'deposit' (a third time)");
     }
 
-    @Order(12)
+    @Order(14)
     @Test
     void testSearchTransactionDepositIlikeBase() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/search_transaction_deposit_iliike_base.sql");
@@ -286,7 +310,7 @@ public class SqlQueriesTest {
         assertTrue(transactionTypes.contains("deposit"), "Should contain 'deposit' (a third time)");
     }
 
-    @Order(13)
+    @Order(15)
     @Test
     void testSearchTransactionDrawLikeBase() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/search_transaction_draw_like_base.sql");
@@ -299,7 +323,7 @@ public class SqlQueriesTest {
         assertTrue(transactionTypes.contains("withdrawal"), "Should contain 'withdrawal' (again)");
     }
 
-    @Order(14)
+    @Order(16)
     @Test
     void testCustomersWithSavingsAccountsKyivLvivBase() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/customers_with_savings_accounts_kyiv_lviv_base.sql");
@@ -313,7 +337,7 @@ public class SqlQueriesTest {
         assertTrue(customerNames.contains("Maria Kyivska"), "Should contain Maria Kyivska");
     }
 
-    @Order(15)
+    @Order(17)
     @Test
     void testHighValueTransactionsSeptember2023Base() throws IOException, SQLException {
         List<Map<String, Object>> results = executeQueryFromFile("queries/high_value_transactions_september_2023_base.sql");

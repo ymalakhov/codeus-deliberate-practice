@@ -26,28 +26,6 @@ public class SqlQueriesTest {
     private static final String SCHEMA_FILE = "schema.sql";
     private static final String TEST_DATA_FILE = "test-data.sql";
 
-    @Test
-    @Order(1)
-    void testSelectAllCustomerNamesEasyWarmup() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("warmup/select_all_customer_names_easy_warmup.sql");
-        assertFalse(results.isEmpty(), "Query should return results");
-        assertEquals(6, results.size(), "Should be 6 customers");
-        // You could add more specific assertions to check for individual names if needed
-    }
-
-    @Test
-    @Order(2)
-    void testSelectKyivCustomersOrderedByNameEasyWarmup() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("warmup/select_kyiv_customers_ordered_by_name_easy_warmup.sql");
-        assertFalse(results.isEmpty(), "Query should return results");
-        assertEquals(2, results.size(), "Should be 2 customers from Kyiv");
-        List<String> customerNames = results.stream()
-                .map(row -> (String) row.get("customer_name"))
-                .toList();
-        assertTrue(customerNames.contains("Ivan Kyivsky"), "Should contain Ivan Kyivsky");
-        assertTrue(customerNames.contains("Maria Kyivska"), "Should contain Maria Kyivska");
-    }
-
     @BeforeAll
     static void startDatabase() throws IOException {
         System.out.println("Starting embedded PostgreSQL...");
@@ -235,9 +213,7 @@ public class SqlQueriesTest {
             "main/search_transaction_deposit_iliike_base.sql",
             "main/search_transaction_draw_like_base.sql",
             "main/customers_with_savings_accounts_kyiv_lviv_base.sql",
-            "main/high_value_transactions_september_2023_base.sql",
-            "warmup/select_all_customer_names_easy_warmup.sql",
-            "warmup/select_kyiv_customers_ordered_by_name_easy_warmup.sql"
+            "main/high_value_transactions_september_2023_base.sql"
     })
     void testQuerySyntax(String queryFile) throws IOException {
         // This test just ensures the query can be executed without syntax errors

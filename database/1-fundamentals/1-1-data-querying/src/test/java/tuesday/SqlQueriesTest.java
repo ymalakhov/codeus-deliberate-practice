@@ -25,12 +25,11 @@ public class SqlQueriesTest {
 
     private static final String SCHEMA_FILE = "schema.sql";
     private static final String TEST_DATA_FILE = "test-data.sql";
-    private static final String QUERIES_DIR = "queries/";
 
     @Test
     @Order(1)
     void testSelectAllCustomerNamesEasyWarmup() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/select_all_customer_names_easy_warmup.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("warmup/select_all_customer_names_easy_warmup.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(6, results.size(), "Should be 6 customers");
         // You could add more specific assertions to check for individual names if needed
@@ -39,7 +38,7 @@ public class SqlQueriesTest {
     @Test
     @Order(2)
     void testSelectKyivCustomersOrderedByNameEasyWarmup() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/select_kyiv_customers_ordered_by_name_easy_warmup.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("warmup/select_kyiv_customers_ordered_by_name_easy_warmup.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(2, results.size(), "Should be 2 customers from Kyiv");
         List<String> customerNames = results.stream()
@@ -126,7 +125,7 @@ public class SqlQueriesTest {
     @Order(3)
     @Test
     void testSelectCustomersKyivLviv() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/select_customers_kyiv_lviv.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/select_customers_kyiv_lviv.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(3, results.size(), "Should be 3 customers from Kyiv or Lviv");
 
@@ -141,7 +140,7 @@ public class SqlQueriesTest {
     @Order(9)
     @Test
     void testSelectCustomersMAndA() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/select_customers_m_and_a.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/select_customers_m_and_a.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(2, results.size(), "Should be 2 customers names start with 'M' and contain 'а'");
 
@@ -155,7 +154,7 @@ public class SqlQueriesTest {
     @Order(10)
     @Test
     void testSelectCustomersUkraineNotKharkiv() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/select_customers_ukraine_not_kharkiv.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/select_customers_ukraine_not_kharkiv.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(4, results.size(), "Should be 4 customers from Ukraine not Kharkiv");
         List<String> customerNames = results.stream()
@@ -170,7 +169,7 @@ public class SqlQueriesTest {
     @Order(4)
     @Test
     void testSelectUniqueCustomerCitiesSorted() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/select_unique_customer_cities_sorted.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/select_unique_customer_cities_sorted.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(4, results.size(), "Should be 4 unique cities");
         List<String> cities = results.stream()
@@ -182,7 +181,7 @@ public class SqlQueriesTest {
     @Order(5)
     @Test
     void testSelectSavingsAccountsBalanceBetween() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/select_savings_accounts_balance_between.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/select_savings_accounts_balance_between.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(2, results.size(), "Should be 2 savings accounts with balance between 10000 and 50000");
 
@@ -196,7 +195,7 @@ public class SqlQueriesTest {
     @Order(6)
     @Test
     void testSelectCurrentAccountsBalanceOutOfRange() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/select_current_accounts_balance_out_of_range.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/select_current_accounts_balance_out_of_range.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(2, results.size(), "Should be 2 current accounts with balance out of range");
 
@@ -210,7 +209,7 @@ public class SqlQueriesTest {
     @Order(11)
     @Test
     void testSelectAccountsSortedByTypeAndBalance() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/select_accounts_sorted_by_type_and_balance.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/select_accounts_sorted_by_type_and_balance.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(6, results.size(), "Should be 6 accounts");
 
@@ -222,23 +221,23 @@ public class SqlQueriesTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "queries/select_customers_kyiv_lviv.sql",
-            "queries/select_customers_m_and_a.sql",
-            "queries/select_customers_ukraine_not_kharkiv.sql",
-            "queries/select_unique_customer_cities_sorted.sql",
-            "queries/select_savings_accounts_balance_between.sql",
-            "queries/select_current_accounts_balance_out_of_range.sql",
-            "queries/select_accounts_sorted_by_type_and_balance.sql",
-            "queries/list_customers_with_checking_accounts_base.sql",
-            "queries/find_transactions_above_10000_sorted_by_date_base.sql",
-            "queries/search_transaction_descriptions_like_base.sql",
-            "queries/search_transaction_descriptions_ilike_base.sql",
-            "queries/search_transaction_deposit_iliike_base.sql",
-            "queries/search_transaction_draw_like_base.sql",
-            "queries/customers_with_savings_accounts_kyiv_lviv_base.sql",
-            "queries/high_value_transactions_september_2023_base.sql",
-            "queries/select_all_customer_names_easy_warmup.sql",
-            "queries/select_kyiv_customers_ordered_by_name_easy_warmup.sql"
+            "main/select_customers_kyiv_lviv.sql",
+            "main/select_customers_m_and_a.sql",
+            "main/select_customers_ukraine_not_kharkiv.sql",
+            "main/select_unique_customer_cities_sorted.sql",
+            "main/select_savings_accounts_balance_between.sql",
+            "main/select_current_accounts_balance_out_of_range.sql",
+            "main/select_accounts_sorted_by_type_and_balance.sql",
+            "main/list_customers_with_checking_accounts_base.sql",
+            "main/find_transactions_above_10000_sorted_by_date_base.sql",
+            "main/search_transaction_descriptions_like_base.sql",
+            "main/search_transaction_descriptions_ilike_base.sql",
+            "main/search_transaction_deposit_iliike_base.sql",
+            "main/search_transaction_draw_like_base.sql",
+            "main/customers_with_savings_accounts_kyiv_lviv_base.sql",
+            "main/high_value_transactions_september_2023_base.sql",
+            "warmup/select_all_customer_names_easy_warmup.sql",
+            "warmup/select_kyiv_customers_ordered_by_name_easy_warmup.sql"
     })
     void testQuerySyntax(String queryFile) throws IOException {
         // This test just ensures the query can be executed without syntax errors
@@ -248,7 +247,7 @@ public class SqlQueriesTest {
     @Order(7)
     @Test
     void testListCustomersWithCheckingAccountsBase() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/list_customers_with_checking_accounts_base.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/list_customers_with_checking_accounts_base.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(3, results.size(), "Should be 3 customers with checking accounts");
         List<String> customerNames = results.stream()
@@ -262,7 +261,7 @@ public class SqlQueriesTest {
     @Order(8)
     @Test
     void testFindTransactionsAbove10000SortedByDateBase() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/find_transactions_above_10000_sorted_by_date_base.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/find_transactions_above_10000_sorted_by_date_base.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(1, results.size(), "Should be 1 transaction above 10000");
         assertEquals("2023-10-15", results.get(0).get("transaction_date").toString(), "Transaction date should be 2023-10-15");
@@ -271,7 +270,7 @@ public class SqlQueriesTest {
     @Order(12)
     @Test
     void testSearchTransactionDescriptionsLikeBase() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/search_transaction_descriptions_like_base.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/search_transaction_descriptions_like_base.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(3, results.size(), "Should be 3 transactions with type starting with 'deposit' (case-sensitive)");
         List<String> transactionTypes = results.stream()
@@ -285,7 +284,7 @@ public class SqlQueriesTest {
     @Order(13)
     @Test
     void testSearchTransactionDescriptionsIlikeBase() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/search_transaction_descriptions_ilike_base.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/search_transaction_descriptions_ilike_base.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(3, results.size(), "Should be 3 transactions with type containing 'deposit' (case-insensitive)");
         List<String> transactionTypes = results.stream()
@@ -299,7 +298,7 @@ public class SqlQueriesTest {
     @Order(14)
     @Test
     void testSearchTransactionDepositIlikeBase() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/search_transaction_deposit_iliike_base.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/search_transaction_deposit_iliike_base.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(3, results.size(), "Should be 3 transactions with type starting with 'deposit' (case-insensitive)");
         List<String> transactionTypes = results.stream()
@@ -313,7 +312,7 @@ public class SqlQueriesTest {
     @Order(15)
     @Test
     void testSearchTransactionDrawLikeBase() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/search_transaction_draw_like_base.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/search_transaction_draw_like_base.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(2, results.size(), "Should be 2 transactions with type containing 'draw' (case-sensitive)");
         List<String> transactionTypes = results.stream()
@@ -326,7 +325,7 @@ public class SqlQueriesTest {
     @Order(16)
     @Test
     void testCustomersWithSavingsAccountsKyivLvivBase() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/customers_with_savings_accounts_kyiv_lviv_base.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/customers_with_savings_accounts_kyiv_lviv_base.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(3, results.size(), "Should be 3 customers with savings accounts in Kyiv or Lviv");
         List<String> customerNames = results.stream()
@@ -340,7 +339,7 @@ public class SqlQueriesTest {
     @Order(17)
     @Test
     void testHighValueTransactionsSeptember2023Base() throws IOException, SQLException {
-        List<Map<String, Object>> results = executeQueryFromFile("queries/high_value_transactions_september_2023_base.sql");
+        List<Map<String, Object>> results = executeQueryFromFile("main/high_value_transactions_september_2023_base.sql");
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(1, results.size(), "Should be 1 high value transaction in September 2023");
         assertEquals("10000.00", results.get(0).get("amount").toString(), "Amount should be 10000.00");

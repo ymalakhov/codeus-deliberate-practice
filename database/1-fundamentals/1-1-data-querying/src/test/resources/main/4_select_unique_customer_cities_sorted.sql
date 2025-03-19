@@ -1,0 +1,3 @@
+SELECT DISTINCT city
+FROM Customers
+ORDER BY city ASC;

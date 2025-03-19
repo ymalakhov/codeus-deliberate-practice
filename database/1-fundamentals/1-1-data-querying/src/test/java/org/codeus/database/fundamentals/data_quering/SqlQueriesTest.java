@@ -1,4 +1,4 @@
-package tuesday;
+package org.codeus.database.fundamentals.data_quering;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.junit.jupiter.api.*;
@@ -291,12 +291,7 @@ public class SqlQueriesTest {
     @Order(17)
     @Test
     void testHighValueTransactionsSeptember2023Base() throws IOException, SQLException {
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         List<Map<String, Object>> results = executeQueryFromFile("main/17_high_value_transactions_september_2023_base.sql");
-        System.out.println("Results for testHighValueTransactionsSeptember2023Base:");
-        for (Map<String, Object> row : results) {
-            System.out.println(row);
-        }
         assertFalse(results.isEmpty(), "Query should return results");
         assertEquals(1, results.size(), "Should be 1 high value transaction in September 2023");
         assertEquals("10000.00", results.get(0).get("amount").toString(), "Amount should be 10000.00");
@@ -328,7 +323,9 @@ public class SqlQueriesTest {
 
     private List<Map<String, Object>> executeQueryFromFile(String queryFileName) throws IOException, SQLException {
         String filePath = getResourcePath(queryFileName);
-        String sql = Files.readString(Paths.get(filePath));
+        String sql = Files.readString(Paths.get(filePath)).trim();
+
+        System.out.printf("Executing query:%n%s%n%n", sql);
 
         List<Map<String, Object>> results = new ArrayList<>();
 
@@ -338,18 +335,62 @@ public class SqlQueriesTest {
             ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
 
+            List<String> columnNames = new ArrayList<>();
+            int[] columnWidths = new int[columnCount];
+
+            for (int i = 1; i <= columnCount; i++) {
+                String columnName = metaData.getColumnLabel(i);
+                columnNames.add(columnName);
+                columnWidths[i - 1] = columnName.length();
+            }
+
             while (resultSet.next()) {
                 Map<String, Object> row = new HashMap<>();
-
-                for (int i = 1; i <= columnCount; i++) {
-                    String columnName = metaData.getColumnLabel(i);
-                    Object value = resultSet.getObject(i);
+                for (int i = 0; i < columnCount; i++) {
+                    String columnName = columnNames.get(i);
+                    Object value = resultSet.getObject(i + 1); // ResultSet is 1-based
                     row.put(columnName, value);
+
+                    String valueStr = (value == null) ? "NULL" : value.toString();
+                    columnWidths[i] = Math.max(columnWidths[i], valueStr.length());
                 }
                 results.add(row);
             }
+
+            if (!results.isEmpty()) {
+                printRow(columnNames, columnWidths);
+                printSeparator(columnWidths);
+
+                for (Map<String, Object> row : results) {
+                    List<String> rowValues = new ArrayList<>();
+                    for (String column : columnNames) {
+                        Object value = row.get(column);
+                        rowValues.add(value == null ? "NULL" : value.toString());
+                    }
+                    printRow(rowValues, columnWidths);
+                }
+                System.out.println();
+            }
         }
-        connection.rollback(); // Rollback transaction after each test
+
+        connection.rollback();
         return results;
+    }
+
+    private void printRow(List<String> values, int[] columnWidths) {
+        StringBuilder sb = new StringBuilder("|");
+        for (int i = 0; i < values.size(); i++) {
+            String format = " %-" + columnWidths[i] + "s |";
+            sb.append(String.format(format, values.get(i)));
+        }
+        System.out.println(sb);
+    }
+
+    private void printSeparator(int[] columnWidths) {
+        StringBuilder sb = new StringBuilder("|");
+        for (int width : columnWidths) {
+            sb.append("-".repeat(width + 2)).append("|");
+        }
+        System.out.println(sb);
     }
 }

@@ -41,7 +41,7 @@ The exercises are based on the following database schema:
 
 ## Exercises and SQL File Mapping
 
-Below is a list of exercises ordered by increasing difficulty, along with the corresponding SQL file name that contains the solution query. These SQL files are located in the `src/test/resources/queries/` directory of the test package.
+Below is a list of exercises ordered by increasing difficulty, along with the corresponding SQL file name that contains the solution query. These SQL files are located in the `src/test/resources/warmup` and `src/test/resources/main` directories of the test package.
 
 **Warm-up Exercises:**
 

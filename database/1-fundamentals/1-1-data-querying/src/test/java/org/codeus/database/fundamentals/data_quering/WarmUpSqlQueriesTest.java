@@ -1,4 +1,4 @@
-package tuesday;
+package org.codeus.database.fundamentals.data_quering;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.junit.jupiter.api.*;
@@ -135,7 +135,9 @@ public class WarmUpSqlQueriesTest {
 
     private List<Map<String, Object>> executeQueryFromFile(String queryFileName) throws IOException, SQLException {
         String filePath = getResourcePath(queryFileName);
-        String sql = Files.readString(Paths.get(filePath));
+        String sql = Files.readString(Paths.get(filePath)).trim();
+
+        System.out.printf("Executing query:%n%s%n%n", sql);
 
         List<Map<String, Object>> results = new ArrayList<>();
 
@@ -145,18 +147,69 @@ public class WarmUpSqlQueriesTest {
             ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
 
+            List<String> columnNames = new ArrayList<>();
+            int[] columnWidths = new int[columnCount];
+
+            // Initialize column names and widths based on headers
+            for (int i = 1; i <= columnCount; i++) {
+                String columnName = metaData.getColumnLabel(i);
+                columnNames.add(columnName);
+                columnWidths[i - 1] = columnName.length();
+            }
+
+            // Process each row to collect data and determine column widths
             while (resultSet.next()) {
                 Map<String, Object> row = new HashMap<>();
 
-                for (int i = 1; i <= columnCount; i++) {
-                    String columnName = metaData.getColumnLabel(i);
-                    Object value = resultSet.getObject(i);
+                for (int i = 0; i < columnCount; i++) {
+                    String columnName = columnNames.get(i);
+                    Object value = resultSet.getObject(i + 1); // ResultSet is 1-based
                     row.put(columnName, value);
+
+                    String valueStr = (value == null) ? "NULL" : value.toString();
+                    if (valueStr.length() > columnWidths[i]) {
+                        columnWidths[i] = valueStr.length();
+                    }
                 }
+
                 results.add(row);
             }
+
+            // Print the results in a formatted table if there are any
+            if (!results.isEmpty()) {
+                printRow(columnNames, columnWidths);
+                printSeparator(columnWidths);
+
+                for (Map<String, Object> row : results) {
+                    List<String> rowValues = new ArrayList<>();
+                    for (String column : columnNames) {
+                        Object value = row.get(column);
+                        rowValues.add(value != null ? value.toString() : "NULL");
+                    }
+                    printRow(rowValues, columnWidths);
+                }
+                System.out.println();
+            }
         }
+
         connection.rollback(); // Rollback transaction after each test
         return results;
+    }
+
+    private void printRow(List<String> values, int[] columnWidths) {
+        StringBuilder sb = new StringBuilder("|");
+        for (int i = 0; i < values.size(); i++) {
+            String format = " %-" + columnWidths[i] + "s |";
+            sb.append(String.format(format, values.get(i)));
+        }
+        System.out.println(sb);
+    }
+
+    private void printSeparator(int[] columnWidths) {
+        StringBuilder sb = new StringBuilder("|");
+        for (int width : columnWidths) {
+            sb.append("-".repeat(width + 2)).append("|");
+        }
+        System.out.println(sb);
     }
 }

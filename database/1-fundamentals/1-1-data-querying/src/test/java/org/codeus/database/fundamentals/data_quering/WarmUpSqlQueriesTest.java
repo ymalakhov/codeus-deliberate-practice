@@ -1,4 +1,4 @@
-package tuesday;
+package org.codeus.database.fundamentals.data_quering;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.junit.jupiter.api.*;

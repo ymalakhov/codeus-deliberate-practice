@@ -85,3 +85,10 @@ CREATE TABLE employees
 ALTER TABLE branches
     ADD COLUMN manager_id INT UNIQUE,
     ADD CONSTRAINT fk_manager FOREIGN KEY (manager_id) REFERENCES employees (id) ON DELETE SET NULL;
+
+
+create table challenges (
+    id SERIAL PRIMARY KEY,
+    challenge_name VARCHAR(55),
+    challenge_task jsonb
+);

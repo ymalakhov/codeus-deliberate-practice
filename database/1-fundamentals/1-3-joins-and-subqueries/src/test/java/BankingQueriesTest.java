@@ -588,25 +588,73 @@ public class BankingQueriesTest {
         }
     }
 
-    private List<Map<String, Object>> executeQueryFromFile(String queryFile) throws IOException, SQLException {
-        String sql = Files.readString(Paths.get("src/test/resources/" + queryFile));
+    private List<Map<String, Object>> executeQueryFromFile(String queryFileName) throws IOException, SQLException {
+        String filePath = "src/test/resources/" + queryFileName;
+        String sql = Files.readString(Paths.get(filePath)).trim();
+
+        System.out.printf("Executing query:%n%s%n%n", sql);
+
         List<Map<String, Object>> results = new ArrayList<>();
 
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            ResultSetMetaData metaData = rs.getMetaData();
+        try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
+            ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
 
-            while (rs.next()) {
+            List<String> columnNames = new ArrayList<>();
+            int[] columnWidths = new int[columnCount];
+
+            for (int i = 1; i <= columnCount; i++) {
+                String name = metaData.getColumnLabel(i);
+                columnNames.add(name);
+                columnWidths[i - 1] = name.length();
+            }
+
+            while (resultSet.next()) {
                 Map<String, Object> row = new HashMap<>();
+
                 for (int i = 1; i <= columnCount; i++) {
-                    row.put(metaData.getColumnLabel(i), rs.getObject(i));
+                    String columnName = columnNames.get(i - 1);
+                    Object value = resultSet.getObject(i);
+                    String valueStr = value == null ? "NULL" : value.toString();
+                    columnWidths[i - 1] = Math.max(columnWidths[i - 1], valueStr.length());
+                    row.put(columnName, value);
                 }
+
                 results.add(row);
             }
+
+            printRow(columnNames, columnWidths);
+            printSeparator(columnWidths);
+
+            for (Map<String, Object> row : results) {
+                List<String> values = new ArrayList<>();
+                for (String col : columnNames) {
+                    Object value = row.get(col);
+                    values.add(value == null ? "NULL" : value.toString());
+                }
+                printRow(values, columnWidths);
+            }
+
+            System.out.println("\n-------------------------------------------------------\n");
         }
+
         return results;
+    }
+
+    private void printRow(List<String> values, int[] widths) {
+        StringBuilder sb = new StringBuilder("|");
+        for (int i = 0; i < values.size(); i++) {
+            sb.append(" ").append(String.format("%-" + widths[i] + "s", values.get(i))).append(" |");
+        }
+        System.out.println(sb);
+    }
+
+    private void printSeparator(int[] widths) {
+        StringBuilder sb = new StringBuilder("|");
+        for (int width : widths) {
+            sb.append("-".repeat(width + 2)).append("|");
+        }
+        System.out.println(sb);
     }
 
     private static void executeSqlFile(String fileName) throws IOException, SQLException {

@@ -13,59 +13,6 @@ CREATE TABLE customers
 );
 
 --------------------------------------------------------------------------------
--- Create Accounts table
---------------------------------------------------------------------------------
-CREATE TABLE accounts
-(
-    id           SERIAL PRIMARY KEY,
-    customer_id  INT                                                         NOT NULL,
-    account_type VARCHAR(20) CHECK (account_type IN ('checking', 'savings')) NOT NULL,
-    balance      DECIMAL(15, 2)                                              NOT NULL DEFAULT 0.00,
-    created_at   TIMESTAMP                                                            DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE
-);
-
---------------------------------------------------------------------------------
--- Create Transactions table
---------------------------------------------------------------------------------
-CREATE TABLE transactions
-(
-    id                SERIAL PRIMARY KEY,
-    account_id        INT                                                                           NOT NULL REFERENCES accounts (id) ON DELETE CASCADE,
-    transaction_type  VARCHAR(20) CHECK (transaction_type IN ('deposit', 'withdrawal', 'transfer')) NOT NULL,
-    amount            DECIMAL(15, 2)                                                                NOT NULL,
-    transaction_date  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    target_account_id INT                                                                           REFERENCES accounts (id) ON DELETE SET NULL
-);
-
---------------------------------------------------------------------------------
--- Create Loans table
---------------------------------------------------------------------------------
-CREATE TABLE loans
-(
-    id            SERIAL PRIMARY KEY,
-    customer_id   INT                                                             NOT NULL,
-    amount        DECIMAL(15, 2)                                                  NOT NULL,
-    interest_rate DECIMAL(5, 2)                                                   NOT NULL,
-    term_months   INT                                                             NOT NULL,
-    status        VARCHAR(20) CHECK (status IN ('active', 'closed', 'defaulted')) NOT NULL DEFAULT 'active',
-    created_at    TIMESTAMP                                                                DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE
-);
-
---------------------------------------------------------------------------------
--- Step 1: Create Branches table WITHOUT manager_id
---------------------------------------------------------------------------------
-CREATE TABLE branches
-(
-    id         SERIAL PRIMARY KEY,
-    name       VARCHAR(100) NOT NULL,
-    location   TEXT         NOT NULL,
-    phone      VARCHAR(20)  NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
---------------------------------------------------------------------------------
 -- Step 2: Create Employees table
 --------------------------------------------------------------------------------
 CREATE TABLE employees
@@ -75,20 +22,25 @@ CREATE TABLE employees
     last_name  VARCHAR(50)    NOT NULL,
     position   VARCHAR(50)    NOT NULL,
     salary     DECIMAL(10, 2) NOT NULL,
-    branch_id  INT            REFERENCES branches (id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 --------------------------------------------------------------------------------
--- Step 3: Add manager_id to Branches table AFTER Employees exists
+-- Step 3: Create challenges table
 --------------------------------------------------------------------------------
-ALTER TABLE branches
-    ADD COLUMN manager_id INT UNIQUE,
-    ADD CONSTRAINT fk_manager FOREIGN KEY (manager_id) REFERENCES employees (id) ON DELETE SET NULL;
 
-
-create table challenges (
+CREATE TABLE challenges (
     id SERIAL PRIMARY KEY,
     challenge_name VARCHAR(55),
     challenge_task jsonb
+);
+
+--------------------------------------------------------------------------------
+-- Step 4: Create orders table
+--------------------------------------------------------------------------------
+CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    order_name VARCHAR(55),
+    amount INT,
+    employee_id INT REFERENCES employees(id) ON DELETE RESTRICT
 );

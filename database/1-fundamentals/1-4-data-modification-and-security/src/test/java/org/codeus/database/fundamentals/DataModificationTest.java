@@ -105,7 +105,7 @@ public class DataModificationTest extends EmbeddedPostgreSqlModificationSetup {
     class UpdateTests {
 
         @Order(1)
-        @DisplayName("Update no existed row")
+        @DisplayName("Update no-existed row")
         @Test
         void testUpdate_nonExistentId() throws Exception {
             String taskFile = "queries/02_01_update_with_incorrect_id.sql";
@@ -182,6 +182,100 @@ public class DataModificationTest extends EmbeddedPostgreSqlModificationSetup {
             final Map<String, Object> row = response.get(0);
             String salary = String.valueOf(row.get("salary"));
             assertEquals("60000.00", salary);
+        }
+    }
+
+    @Nested
+    @Order(3)
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class DeleteTests {
+
+        @Order(1)
+        @DisplayName("Delete non-existed row")
+        @Test
+        void testDelete_nonExistentId() throws Exception {
+            String taskFile = "queries/03_01_delete_with_incorrect_id.sql";
+            setupSchema("schema.sql", "test-data.sql");
+            int result = executeModificationQueryFromFile(taskFile);
+            System.out.println("Rows affected: " + result);
+            assertEquals(0, result, "No row affected for non-existed id");
+        }
+
+        @Order(2)
+        @DisplayName("Delete without condition")
+        @Test
+        void testDelete_withoutCondition() throws Exception {
+            String taskFile = "queries/03_02_delete_without_condition.sql";
+            setupSchema("schema.sql", "test-data.sql");
+            int result = executeModificationQueryFromFile(taskFile);
+            System.out.println("Rows affected: " + result);
+            assertEquals(2, result, "All rows should be affected.");
+        }
+
+        @Order(3)
+        @DisplayName("Delete without condition workaround")
+        @Test
+        void testDelete_withoutConditionWorkaround() throws Exception {
+            String taskFile = "queries/03_03_delete_without_condition_workaround.sql";
+            setupSchema("schema.sql", "test-data.sql");
+            executeModificationQueryFromFile(taskFile);
+
+            String sql = "SELECT id, first_name, last_name, is_deleted FROM customers";
+            final List<Map<String, Object>> response = executeQuery(sql);
+            printQueryResults(response);
+            for (Map<String, Object> elements : response) {
+                final boolean isDeleted = (Boolean) elements.get("is_deleted");
+                if (!isDeleted) {
+                    fail("All rows should be soft deleted");
+                }
+            }
+        }
+
+        @Order(4)
+        @DisplayName("Delete with foreign key")
+        @Test
+        void testDelete_withForeignKey() throws Exception {
+            String taskFile = "queries/03_04_delete_with_foreign_key.sql";
+            setupSchema("schema.sql", "test-data.sql");
+
+            executeModificationQueryFromFile(taskFile);
+
+            String sql2 = "SELECT * FROM orders WHERE employee_id = 1";
+            final List<Map<String, Object>> orderResponse = executeQuery(sql2);
+            assertEquals(0, orderResponse.size(), "Dependent record in orders should be deleted first");
+
+            String sql3 = "SELECT * FROM employees WHERE id = 1";
+            final List<Map<String, Object>> employeeResponse = executeQuery(sql3);
+            assertEquals(0, employeeResponse.size(), "Employee with id 1 should be deleted");
+
+        }
+
+        @Order(5)
+        @DisplayName("Delete with returning")
+        @Test
+        void testDelete_withReturning() throws Exception {
+            String taskFile = "queries/03_05_delete_with_returning.sql";
+            setupSchema("schema.sql", "test-data.sql");
+            final List<Map<String, Object>> response = executeQueryFromFile(taskFile);
+            assertEquals(1, response.size(), "Only one row should be affected.");
+
+            final Map<String, Object> row = response.get(0);
+            final String firstName = String.valueOf(row.get("first_name"));
+            assertFalse(firstName.isEmpty());
+            final String lastName = String.valueOf(row.get("last_name"));
+            assertFalse(lastName.isEmpty());
+            final String salary = String.valueOf(row.get("salary"));
+            assertFalse(salary.isEmpty());
+        }
+
+        @Order(6)
+        @DisplayName("Delete with rollback")
+        @Test
+        void testDelete_withRollback() throws Exception {
+            String taskFile = "queries/03_06_delete_with_rollback.sql";
+            setupSchema("schema.sql", "test-data.sql");
+            final int result = executeModificationQueryFromFile(taskFile);
+            assertEquals(0, result);
         }
 
     }
